@@ -1,0 +1,201 @@
+
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/sysconfig/selinux 
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config 
+
+sudo vi /etc/systemd/system/disable-thp.service
+
+[Unit]
+Description=Disable Transparent Huge Pages (THP)
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c "echo 'never' > /sys/kernel/mm/transparent_hugepage/enabled && echo 'never' > /sys/kernel/mm/transparent_hugepage/defrag"
+
+[Install]
+WantedBy=multi-user.target
+
+sudo systemctl daemon-reload
+
+sudo systemctl start disable-thp
+sudo systemctl enable disable-thp
+
+
+cat /sys/proc/vm/swappiness
+
+echo "vm.swappiness = 1" >> /etc/sysctl.conf 
+
+ df -h
+ sudo resize2fs /dev/xvde
+
+ =====
+ package installation
+ ============
+ 
+ yum -y update
+yum -y install ntp 
+chkconfig ntpd on
+
+service ntpd start
+service ntpd status
+
+
+yum -y install wget
+yum -y install yum-utils
+yum -y install unzip
+
+yum -y install httpd
+systemctl restart httpd
+chkconfig httpd on
+
+reboot the entire ec2 instance
+
+and verify the pre-requisites
+
+===========mysql database installation============
+
+yum update -y
+
+wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+rpm –ivh mysql-community-release-el7-5.noarch.rpm
+yum –y install mysql-server mysql-connector-java
+ls -ltr /usr/share/java/mysql*
+
+systemctl restart mysqld
+systemctl status mysqld
+
+systemctl enable mysqld
+
+
+/usr/bin/mysql_secure_installation
+
+
+
+mysql  -u root -h localhost –p
+
+mysql>show databases;
+mysql> create user ‘temp’@’%’ identified by ‘password123’;
+mysql> grant all privileges on *.* to ‘temp’@’%’ with grant option;
+mysql>flush privileges;
+mysql>quit
+mysql -u temp -h localhost -p
+
+mysql> create database reportmanager;
+mysql> use reportmanager;
+mysql>create user ‘reportmanager’@’%’ identified by ‘password123’;
+mysql>grant all privileges on *.* to ‘reportmanager’@’%’ with grant option;
+
+mysql> create database hive;
+mysql> use hive;
+mysql>create user 'hive'@'%' identified by 'password123';
+mysql>grant all privileges on *.* to 'hive'@'%' with grant option;
+
+mysql> create database hue;
+mysql> use hue;
+mysql>create user 'hue'@'%' identified by 'password123';
+mysql>grant all privileges on *.* to 'hue'@'%' with grant option;
+
+mysql> create database oozie;
+mysql> use oozie;
+mysql>create user 'oozie'@'%' identified by 'password123';
+mysql>grant all privileges on *.* to 'oozie'@'%' with grant option;
+
+====we can verify the same in heidi sql UI interface===================
+
+
+
+===============
+verify the contents
+===============
+ 
+cat /etc/sysconfig/selinux  
+cat /etc/selinux/config 
+
+cat /sys/kernel/mm/transparent_hugepage/enabled
+cat /sys/kernel/mm/transparent_hugepage/defrag
+
+
+cat /proc/sys/vm/swappiness
+
+============
+extract parcels
+=============
+http://archive.cloudera.com/cm5/repo-as-tarball/5.14.1/
+
+wget http://archive.cloudera.com/cm5/repo-as-tarball/5.14.1/cm5.14.1-centos7.tar.gz
+
+tar zxvf cm5.14.1-centos7.tar.gz -C /var/www/html/
+
+cd /var/www/html
+
+mkdir cdh5.14.0
+
+cd cdh5.14.0
+
+wget http://archive.cloudera.com/cdh5/parcels/5.14/CDH-5.14.4-1.cdh5.14.4.p0.3-el7.parcel
+wget http://archive.cloudera.com/cdh5/parcels/5.14/manifest.json
+
+=================
+
+cd /etc/yum.repos.d
+
+
+vi /etc/yum.repos.d/cloudera-manager.repo
+
+[cloudera-manager]
+name=cloudera-manager
+baseurl = http://private-ip-or-dns-of-repo-server/cm/5.14.1/
+enabled=1
+gpgcheck=0
+gpgfile=http://private-ip-or-dns-of-repo-server/cm/RPM-GPG-KEY-cloudera
+
+
+yum clean all
+yum makecache
+yum list all | grep cloudera
+yum repolist
+
+yum -y install cloudera-manager-agent.x86_64 cloudera-manager-daemons.x86_64 cloudera-manager-server.x86_64 oracle-j2sdk1.7.x86_64
+
+cd /usr/java/jdk1.7.0_67-cloudera/
+
+cd /etc/default/
+
+cat cloudera-scm-server
+
+vi cloudera-scm-server
+
+export JAVA_HOME=/usr/java/jdk1.7.0_67-cloudera/
+
+cd /usr/share/cmf/schema
+
+/usr/share/cmf/schema/scm_prepare_database.sh mysql -h localhost -uroot -ppassword --scm-host localhost scm scm scm
+
+/usr/share/cmf/schema/scm_prepare_database.sh mysql -h localhost -uroot -ppassword --scm-host localhost scm scm scm
+
+vi /etc/cloudera-scm-agent/config.ini
+
+server_host = <private dns>
+export JAVA_HOME=/usr/java/jdk1.7.0_67-cloudera/
+
+service cloudera-scm-server start
+chkconfig cloudera-scm-server on
+
+service cloudera-scm-agent start
+chkconfig cloudera-scm-agent on
+
+
+<public dns>:7180
+
+admin/admin
+
+==================
+
+with this cloudera manager setup completed.. Lets try above things
+
+Ec2 - instance - RHEL 7.5 and 2 CPU and 8 GB RAM and 50 GB
+
+================
+
+http://ip-172-31-85-89.ec2.internal/cm/5.14.1
+
+http://ip-172-31-85-89.ec2.internal/cm/RPM-GPG-KEY-cloudera

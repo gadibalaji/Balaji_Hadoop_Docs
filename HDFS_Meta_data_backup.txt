@@ -1,0 +1,59 @@
+HDFS Metadata Backup
+=====================
+
+apache hadoop level
+
+1.su - hdfs
+
+2.If HDFS service is Kerberos authentication
+we have to do kniit
+
+knit -kt /etc/security/keytabs/hdfs.headless.keytab hdfs@example.com
+
+3.  second point is optional
+
+4. put the name node in safe mode.
+
+hdfs dfsadmin -safemode enter
+
+hdfs dfsadmin -savenamespace
+
+5.hdfs dfsadmin -fetchimage Local_dir_path
+
+6.hdfs dfsadmin -safemode leave
+
+=======================================
+
+Thru cloudera HDFS meta data backup
+
+1.shutdown the cluster
+2.Ensure that both name nodes not be in running state.\
+3. go to HDFS service -. Configuration - data directory
+
+take that path and go to that on host which namenode is running..
+
+cd data directory path
+tar cvf /root/namenode_metadata_bkpyyyymmdd.txt
+
+4. in the above path there should not be lock file.
+
+5. restart the name node servicess
+
+=====================================
+How to recover the metadata from HDFS
+=====================================
+
+1. remove the NN , journal nodes and fail over roles in cloudera manager from HDfS service
+
+2. add the host on which the Name node roles running
+3. configure NN data directory, put the permissions, ownership and groups set correctly.
+4.copy the backup data directory to thhis currennt data datectory
+
+5.add the name node role host
+6.add the secondary node role host
+7. enable high availability
+
+
+
+
+

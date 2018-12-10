@@ -1,0 +1,25 @@
+Cloudera newly added host
+
+new host 
+
+prerequisites
+yum local repo server
+cloudera agents, daemons and JDK installation
+configure this 	new machine to point to this cloudera manager using /etc/cloudera-scm-agent/config.ini
+and after that
+restart the agents..
+then after you check enough space is there on not /opt
+
+newly added host 
+================
+1. go to cloudera manager console
+2. click new host - added newly host wizard 
+3. enter new host FQDN name and password less SSH info.
+parcels will be downloaded , distributed, unpakcged and activated, we can check status in /opt/cloudera
+4. provide roles to this newly added host we can do it using template or new one.
+5. start the roles.
+6. go to HDFS -> verify if datanode role is added for this newly service , need to run balancer.
+
+
+
+

@@ -1,0 +1,16 @@
+
+How to decommission host using cloudera manager
+
+decommssion means its stop using this node. for that we need to check
+
+first what are the roles assigned to this node which we planned for decommission
+
+1. If roles are like HDFS, datanode and resource manager, task tracker and node amanger and regions server then we can go ahead with decommission.
+
+if any other roles are along with above roles, we need to manually decommission and then remove the above host from cloudera manager.
+
+after decommissioned,
+
+we will do some santiy checks
+
+we will remove the host from cluster and remove from cloudera manager
